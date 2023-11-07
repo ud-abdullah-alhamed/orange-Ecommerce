@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:my_app/api_testing/widget/news_api.dart';
-import 'package:my_app/api_testing/widget/post_api.dart';
-import 'package:my_app/constant/color.dart';
+import 'package:get/get.dart';
+import 'package:my_app/core/contsants/constants.dart';
+import 'package:my_app/features/onboard/presention/pages/onboard_page.dart';
+import 'package:my_app/features/regitser/presention/pages/register_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,17 +11,17 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        colorScheme: ColorScheme.light(
-            primary: ColorConstants.mainScaffoldBackgroundColor),
-        useMaterial3: true,
-      ),
-      home: const PostApiExample(),
+    return GetMaterialApp(
+      title: 'GetX Example',
+      theme: ThemeData(colorScheme: ColorScheme.light(primary: appcolor)),
+      initialRoute: '/',
+      getPages: [
+        GetPage(name: '/', page: () => const OnboardPage()),
+        GetPage(name: '/Register', page: () => const RegisterPage()),
+      ],
+      home: const OnboardPage(),
     );
   }
 }
