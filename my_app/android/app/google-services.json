@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "691085027523",
+    "project_id": "orange-project-58131",
+    "storage_bucket": "orange-project-58131.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:691085027523:android:b535b34d85ac2eff005a76",
+        "android_client_info": {
+          "package_name": "com.example.my_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgbUWFmScn5026bJC9oC6hRSi4LwdzPAA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

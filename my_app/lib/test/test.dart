@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
-
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 import 'package:flutter_svg/svg.dart';
 import 'package:my_app/test/container_widget/contianer.dart';
 
@@ -201,7 +204,7 @@ Column optionWidget(String title, String icon) {
         height: 60,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          color: Color(0xffFEECE2),
+          color: const Color(0xffFEECE2),
         ),
         child: Padding(
           padding: const EdgeInsets.all(18.0),
@@ -267,4 +270,370 @@ productWidget(String image, String fTitle, String sTitile) {
       priceText(sTitile)
     ],
   );
+}
+
+class ProductList extends StatefulWidget {
+  const ProductList({super.key});
+
+  @override
+  ProductListState createState() => ProductListState();
+}
+
+class ProductListState extends State<ProductList> {
+  late ScrollController _scrollController;
+  final List<Product> _products = [];
+  bool _isLoading = false;
+  int _page = 1; // Initial page
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController = ScrollController()..addListener(_scrollListener);
+    _loadData();
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _scrollListener() {
+    if (_scrollController.position.pixels ==
+        _scrollController.position.maxScrollExtent) {
+      // User has reached the end of the list, load more data
+      _loadData();
+    }
+  }
+
+  Future<void> _loadData() async {
+    if (!_isLoading) {
+      setState(() {
+        _isLoading = true;
+      });
+
+      final response = await http.get(Uri.parse(
+          'https://fakestoreapi.com/products?_page=$_page&_limit=10'));
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+        List<Product> newProducts =
+            data.map((json) => Product.fromJson(json)).toList();
+
+        setState(() {
+          _products.addAll(newProducts);
+          _page++;
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
+        throw Exception('Failed to load products');
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      controller: _scrollController,
+      itemCount: _products.length + 1, // Add one for the loading indicator
+      itemBuilder: (context, index) {
+        if (index < _products.length) {
+          return ListTile(
+            title: Text(_products[index].title),
+            subtitle: Text('\$${_products[index].price.toStringAsFixed(2)}'),
+            leading: Image.network(_products[index].imageUrl),
+          );
+        } else {
+          // Display loading indicator at the end of the list
+          return _isLoading ? const CircularProgressIndicator() : Container();
+        }
+      },
+    );
+  }
+}
+
+class Product {
+  final String title;
+  final double price;
+  final String imageUrl;
+  final String description;
+  Rating rating;
+  Product({
+    required this.title,
+    required this.price,
+    required this.imageUrl,
+    required this.description,
+    required this.rating,
+  });
+
+  factory Product.fromJson(Map<String, dynamic> json) {
+    return Product(
+      title: json['title'],
+      price: json['price'].toDouble(),
+      imageUrl: json['image'],
+      description: json['description'],
+      rating: Rating.fromJson(json['rating']),
+    );
+  }
+}
+
+class Rating {
+  double rate;
+  int count;
+
+  Rating({
+    required this.rate,
+    required this.count,
+  });
+
+  factory Rating.fromJson(Map<String, dynamic> json) {
+    return Rating(
+      rate: json['rate'].toDouble(),
+      count: json['count'],
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'rate': rate,
+      'count': count,
+    };
+  }
+}
+
+/////////////
+
+class ProductController extends GetxController {
+  late ScrollController scrollController;
+  var products = <Product>[].obs;
+  var isLoading = false.obs;
+  var page = 1;
+
+  @override
+  void onInit() {
+    super.onInit();
+    scrollController = ScrollController()..addListener(_scrollListener);
+    _loadData();
+  }
+
+  void _scrollListener() {
+    if (scrollController.position.pixels ==
+        scrollController.position.maxScrollExtent) {
+      // User has reached the end of the list, load more data
+      _loadData();
+    }
+  }
+
+  Future<void> _loadData() async {
+    if (!isLoading.value) {
+      isLoading.toggle();
+
+      final response = await http.get(
+          Uri.parse('https://fakestoreapi.com/products?_page=$page&_limit=10'));
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+        List<Product> newProducts =
+            data.map((json) => Product.fromJson(json)).toList();
+
+        products.addAll(newProducts);
+        page++;
+        isLoading.toggle();
+      } else {
+        isLoading.toggle();
+        throw Exception('Failed to load products');
+      }
+    }
+  }
+
+  @override
+  void onClose() {
+    scrollController.dispose();
+    super.onClose();
+  }
+}
+
+class ProductListt extends StatelessWidget {
+  const ProductListt({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final ProductController productController = Get.put(ProductController());
+
+    return Obx(
+      () => ListView.builder(
+        controller: productController.scrollController,
+        itemCount: productController.products.length +
+            1, // Add one for the loading indicator
+        itemBuilder: (context, index) {
+          if (index < productController.products.length) {
+            return ListTile(
+              title: Text(productController.products[index].title),
+              subtitle: Text(
+                  '\$${productController.products[index].price.toStringAsFixed(2)}'),
+              leading:
+                  Image.network(productController.products[index].imageUrl),
+            );
+          } else {
+            // Display loading indicator at the end of the list
+            return productController.isLoading.value
+                ? const Center(child: CircularProgressIndicator())
+                : Container();
+          }
+        },
+      ),
+    );
+  }
+}
+
+class Producttt {
+  final String title;
+  final double price;
+  final String imageUrl;
+  final String description;
+
+  Producttt(
+      {required this.title,
+      required this.price,
+      required this.description,
+      required this.imageUrl});
+
+  factory Producttt.fromJson(Map<String, dynamic> json) {
+    return Producttt(
+      title: json['title'],
+      price: json['price'].toDouble(),
+      imageUrl: json['image'],
+      description: json['description'],
+    );
+  }
+}
+
+//////////
+class ProductControll extends GetxController {
+  late ScrollController scrollController;
+  var products = <Product>[].obs;
+  var isLoading = false.obs;
+  var page = 1;
+
+  @override
+  void onInit() {
+    super.onInit();
+    scrollController = ScrollController()..addListener(_scrollListener);
+    _loadData();
+  }
+
+  void _scrollListener() {
+    if (scrollController.position.pixels ==
+        scrollController.position.maxScrollExtent) {
+      // User has reached the end of the list, load more data
+      _loadData();
+    }
+  }
+
+  Future<void> _loadData() async {
+    if (!isLoading.value) {
+      isLoading.toggle();
+
+      final response = await http.get(
+          Uri.parse('https://fakestoreapi.com/products?_page=$page&_limit=10'));
+
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+        List<Product> newProducts =
+            data.map((json) => Product.fromJson(json)).toList();
+
+        products.addAll(newProducts);
+        page++;
+        isLoading.toggle();
+      } else {
+        isLoading.toggle();
+        throw Exception('Failed to load products');
+      }
+    }
+  }
+
+  @override
+  void onClose() {
+    scrollController.dispose();
+    super.onClose();
+  }
+}
+
+class ProductLis extends StatelessWidget {
+  const ProductLis({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final ProductController productController = Get.put(ProductController());
+
+    return Obx(
+      () => ListView.builder(
+        controller: productController.scrollController,
+        scrollDirection: Axis.horizontal,
+        itemCount: productController.products.length +
+            1, // Add one for the loading indicator
+        itemBuilder: (context, index) {
+          if (index < productController.products.length) {
+            return Container(
+              margin: const EdgeInsets.all(8.0),
+              width: 200.0,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Image.network(
+                    productController.products[index].imageUrl,
+                    height: 150.0,
+                    width: 200.0,
+                    fit: BoxFit.cover,
+                  ),
+                  const SizedBox(height: 8.0),
+                  Text(
+                    productController.products[index].title,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(
+                      '\$${productController.products[index].price.toStringAsFixed(2)}'),
+                  Text(productController.products[index].description),
+                  Text(
+                      productController.products[index].rating.rate.toString()),
+                  Text(
+                      productController.products[index].rating.count.toString())
+                ],
+              ),
+            );
+          } else {
+            // Display loading indicator at the end of the list
+            return productController.isLoading.value
+                ? const CircularProgressIndicator()
+                : Container();
+          }
+        },
+      ),
+    );
+  }
+}
+
+class Produc {
+  final String title;
+  final double price;
+  final String imageUrl;
+  final String description;
+
+  Produc(
+      {required this.title,
+      required this.price,
+      required this.imageUrl,
+      required this.description});
+
+  factory Produc.fromJson(Map<String, dynamic> json) {
+    return Produc(
+        title: json['title'],
+        price: json['price'].toDouble(),
+        imageUrl: json['image'],
+        description: json['description']);
+  }
 }

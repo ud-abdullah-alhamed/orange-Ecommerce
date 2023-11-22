@@ -1,9 +1,6 @@
-//on board Strings
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:my_app/features/onboard/data/models/textinput_model.dart';
-import 'package:my_app/features/regitser/presention/getx/register_controller.dart';
 import 'package:my_app/features/onboard/presention/widget/widgets_collection/custom_widget/slider/slider_container.dart';
+//on board Strings
 
 String onboardTitle = 'TOKOTO';
 String onboardwelcame = 'Welcome to TOKOTO , Let`s shop!';
@@ -25,6 +22,16 @@ String adscontainercontent = 'Cashback 20%';
 String categoryTilte = 'Special for you';
 String productTilte = 'Popular Products';
 
+String maincouponText = 'A Summer Surpise';
+
+String seconedcouponText = 'Cashback 20%';
+
+String offersTitle = 'Special for you';
+
+String productstitle = 'Popular Prouducts';
+
+String seemore = 'See more';
+
 // app colors
 Color primaryColor = const Color(0xffFF7643);
 
@@ -35,6 +42,16 @@ Color appcolor = const Color(0xffFEECE2);
 Color pagecolor = const Color(0xffffffff);
 
 Color backIconButton = const Color(0xff000000);
+
+Color categorycolor = const Color(0xffFEECE2);
+
+Color? subcolor = Colors.grey[200];
+
+Color? deepsubcolor = Colors.grey[700];
+
+Color successful = Colors.green;
+
+Color errorColor = Colors.red;
 
 // sizes
 
@@ -52,40 +69,3 @@ List<SliderContainer> imgeList = const [
 
 // register List
 
-final controller = Get.put(RegisterController());
-
-List<Textinput> textinputs = [
-  Textinput(
-      controller: controller.email,
-      enableText: false,
-      hintText: 'Enter your Email',
-      icon: const Icon(Icons.email),
-      invisible: false,
-      validator: null,
-      type: TextInputType.emailAddress,
-      onChange: null,
-      inputFormat: [],
-      title: email),
-  Textinput(
-      controller: controller.password,
-      enableText: false,
-      hintText: 'Enter your Password',
-      icon: const Icon(Icons.lock),
-      invisible: false,
-      validator: null,
-      type: TextInputType.visiblePassword,
-      onChange: null,
-      inputFormat: [],
-      title: password),
-  Textinput(
-      controller: controller.confirmPassword,
-      enableText: false,
-      hintText: 'Re-enter your password',
-      icon: const Icon(Icons.lock),
-      invisible: false,
-      validator: null,
-      type: TextInputType.visiblePassword,
-      onChange: null,
-      inputFormat: [],
-      title: confirmPassword),
-];

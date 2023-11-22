@@ -1,6 +1,6 @@
 // ignore_for_file: must_be_immutable
 
-import 'package:my_app/features/onboard/domain/entities/textinput_entity.dart';
+import 'package:my_app/features/regitser/domain/entities/textinput_entity.dart';
 
 class Textinput extends TextinputEntity {
   Textinput(

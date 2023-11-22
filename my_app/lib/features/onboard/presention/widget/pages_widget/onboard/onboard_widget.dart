@@ -25,7 +25,7 @@ class OnboardWidget extends StatelessWidget {
               const SizedBox(height: 100),
               SliderWidget(item: imgeList),
               Expanded(child: Container()),
-              mainContainer(() => Get.to(RegisterPage()))
+              mainContainer(() => Get.to(const RegisterPage()))
             ],
           ),
         ),

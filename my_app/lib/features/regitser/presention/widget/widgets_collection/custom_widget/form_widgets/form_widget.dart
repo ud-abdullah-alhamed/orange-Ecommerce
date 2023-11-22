@@ -1,7 +1,7 @@
 // ignore: must_be_immutable
 import 'package:flutter/material.dart';
 import 'package:my_app/core/contsants/constants.dart';
-import 'package:my_app/features/onboard/data/models/textinput_model.dart';
+import 'package:my_app/features/regitser/data/models/textinput_model.dart';
 
 class FormWidget extends StatefulWidget {
   const FormWidget({required this.form, Key? key}) : super(key: key);
@@ -32,7 +32,7 @@ class _FormWidgetState extends State<FormWidget> {
             decoration: InputDecoration(
               label: Text(widget.form.title),
               floatingLabelBehavior: FloatingLabelBehavior.always,
-              floatingLabelStyle: TextStyle(color: Colors.black),
+              floatingLabelStyle: const TextStyle(color: Colors.black),
               focusedBorder: OutlineInputBorder(
                   borderSide: BorderSide(color: pagecolor),
                   borderRadius: const BorderRadius.all(Radius.circular(15))),
